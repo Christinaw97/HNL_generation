@@ -1,5 +1,15 @@
 import csv
 
+import subprocess
+
+def get_git_root():
+    return subprocess.check_output(
+        ["git", "rev-parse", "--show-toplevel"],
+        text=True
+    ).strip()
+
+
+
 def get_ctau(flavor, mass, coupling, csv_file="/uscms_data/d3/christiw/Run3_MDS/private_generation/gridpacks_generation/HNL_generation/data/decay_results.csv"):
     """
     Read a CSV file and return ctau for a given HNL flavor, mass, and coupling.
@@ -25,6 +35,33 @@ def get_ctau(flavor, mass, coupling, csv_file="/uscms_data/d3/christiw/Run3_MDS/
             if row["name"] == target_name: ctau_default = float(row["ctau [mm]"])
     if ctau_default is None: print("mass and flavor combination not found in csv")
     return ctau_default * float(default_coupling.replace('p','.'))**2/coupling**2
+def get_coupling(flavor, mass, ctau,  csv_file="/uscms_data/d3/christiw/Run3_MDS/private_generation/gridpacks_generation/HNL_generation/data/decay_results.csv"):
+    """
+    Read a CSV file and return coupling for a given HNL flavor, mass, and ctau
+
+    Args:
+        csv_file (str): Path to the CSV file.
+        flavor (str): Flavor of HNL ('e', 'mu', or 'tau').
+        mass (float): HNL mass (e.g. 5.0).
+        ctau (float): ctau in mm
+
+    Returns:
+        float or None: The coupling
+    """
+    if type(mass) == int: m_str = str(mass)+'p0'
+    else: m_str = str(mass).replace('.', 'p')
+    default_coupling = "0p01"
+    target_name = f"HNL_{flavor}_mN_{m_str}_coupling_{default_coupling}_13p6TeV"
+    ctau_default = None
+    with open(csv_file, newline='', encoding='utf-8') as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            if row["name"] == target_name: ctau_default = float(row["ctau [mm]"])
+    if ctau_default is None: print("mass and flavor combination not found in csv")
+    return (ctau_default/ctau* float(default_coupling.replace('p','.'))**2)**0.5
+
+
+
 
 def get_xsec(flavor, mass, coupling = None, ctau = None, csv_file="/uscms_data/d3/christiw/Run3_MDS/private_generation/gridpacks_generation/HNL_generation/data/decay_results.csv"):
     """
@@ -65,10 +102,3 @@ def get_xsec(flavor, mass, coupling = None, ctau = None, csv_file="/uscms_data/d
     if ctau: return xsec_default * ctau_default / ctau
     return None
     
-    
-
-print(get_xsec("e",2.0,0.0804))
-print(get_xsec("e",2,1))
-print(get_xsec("e",2,0.0568))
-print(get_xsec("e",2,0.0359))
-print(get_xsec("e",2,0.001137))

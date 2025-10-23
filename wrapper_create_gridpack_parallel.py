@@ -3,7 +3,9 @@ import subprocess
 import time
 import psutil
 import os
-
+import sys
+sys.path.append(os.path.abspath('scripts/'))
+from utilities import *
 # Configuration
 max_parallel = 3        # number of parallel jobs
 min_free_gb = 2.0       # minimum free memory before starting new job
@@ -14,12 +16,14 @@ os.makedirs(log_dir, exist_ok=True)
 running = []
 
 for decay in ["e", "mu", "tau"]:
-    for m in np.arange(1.0,1.4,0.5):
+    for m in np.arange(2,11,1.0):
         m_str = str(m).replace('.','p')
-        for coupling in [0.01]:
-            name = f"HNL_{decay}_mN_{m_str}_coupling_0p01_13p6TeV"
+        #for coupling in [0.01]:
+            #name = f"HNL_{decay}_mN_{m_str}_coupling_0p01_13p6TeV"
+        for ctau in [1,10,100,1000,10000]:#mm
+            name = f"HNL_{decay}_mN_{m_str}_ctau_{ctau}_13p6TeV"
             log_file = os.path.join(log_dir, f"{name}.log")
-
+            coupling = get_coupling(decay, m, ctau)
             cmd = [
                 "python3", "create_gridpack.py",
                 "-o", name,

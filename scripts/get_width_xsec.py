@@ -12,6 +12,7 @@ import sys
 import re
 import csv
 import os
+from utilities import *
 
 def get_decay_value(filepath):
     """
@@ -32,7 +33,7 @@ def get_xsec(file_path):
 
     
     # Regex pattern to match the section and extract the cross-section
-    pattern = r"=== Results Summary for run: pilotrun tag: WJets ===\s+Cross-section\s+:\s+([0-9.]+)\s+\+-\s+([0-9.]+)\s+pb"
+    pattern = r"=== Results Summary for run: pilotrun tag: WJets ===\s+Cross-section\s*:\s*([0-9.eE+-]+)\s*\+-\s*([0-9.eE+-]+)\s*pb"
     
     with open(file_path, "r") as file:
         content = file.read()
@@ -59,7 +60,7 @@ c = 299792458000.0 # speed of light in mm/s
 # Output CSV file
 output_file = "../data/decay_results.csv"
 
-BASE_PATH="/uscms_data/d3/christiw/Run3_MDS/private_generation/gridpacks_generation/HNL_generation/genproductions_scripts/bin/MadGraph5_aMCatNLO"
+BASE_PATH=f"{get_git_root()}/genproductions_scripts/bin/MadGraph5_aMCatNLO"
 
 # Write header
 with open(output_file, "w", newline="") as csvfile:
@@ -69,10 +70,10 @@ with open(output_file, "w", newline="") as csvfile:
     for decay in ["e", "mu", "tau"]:
         for m in np.arange(1., 10.5, 0.5):
             m_str = str(m).replace('.', 'p')
-            for coupling in [0.01]:
+            for coupling in [0.01]: 
+                #name = f"HNL_{decay}_mN_{m_str}_ctau_{ctau}_13p6TeV"
                 name = f"HNL_{decay}_mN_{m_str}_coupling_0p01_13p6TeV"
                 filepath = f"{BASE_PATH}/{name}/{name}_gridpack/work/gridpack/process/madevent/Cards/param_card.dat"
-
                 width = get_decay_value(filepath)
                 gridpack_log = f"{BASE_PATH}/{name}/{name}_gridpack/work/gridpack/gridpack_generation.log"
                 xsec,unc = get_xsec(gridpack_log)
@@ -84,6 +85,7 @@ with open(output_file, "w", newline="") as csvfile:
                     writer.writerow([name, width, ctau, xsec, unc])
                 else:
                     print(f"{name}: ERROR!!")
+                    print(width, xsec,unc)
                     writer.writerow([name, "N/A", "N/A","N/A","N/A","N/A"])
 
 print(f"\n Results saved to {os.path.abspath(output_file)}")

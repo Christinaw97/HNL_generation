@@ -1,3 +1,4 @@
+import os
 import matplotlib.pyplot as plt
 import numpy as np
 from utilities import *
@@ -6,6 +7,8 @@ from utilities import *
 # CSV should have columns: mass, ctau, cross_section
 
 # Get unique masses
+os.makedirs(f"{get_git_root()}/plots/", exist_ok=True)
+
 masses = [1,1.5,2,2.5, 3,4,5,6,8,10]
 ctau = [1,10,50,100,500,1000,1000, 10000]
 for flavor in ['e','mu','tau']:
@@ -26,5 +29,5 @@ for flavor in ['e','mu','tau']:
 
     plt.grid(True, which="both", ls="--", alpha=0.5)
     plt.tight_layout()
-    plt.savefig(f'cross_section_{flavor}.png')  # Save figure
+    plt.savefig(f'{get_git_root()}/plots/cross_section_{flavor}.png')  # Save figure
     
