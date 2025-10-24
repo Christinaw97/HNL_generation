@@ -17,8 +17,10 @@ cd scripts
 python3 check_logs.py ../logs
 ```
 
-#### Initial gridpacks run (Don't need to be repeated by everyone)
+#### Initial gridpacks run (Doesn't need to be repeated by everyone, to get coupling to ctau relationship)
 * Generated gridpacks for all flavor and mass combination at one coupling to know the relationship between the three variables
 * Run `python3 scripts/get_width_xsec.py` to generate `data/decay_results.csv` storing all the info
 * Functions in `scripts/utilities.py` make use of the csv file
+
+### Plotting script ###
 * Plot xsec vs ctau for different masses: `python3 scripts/plot_xsec.py`
