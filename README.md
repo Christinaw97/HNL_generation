@@ -1,8 +1,10 @@
 # HNL generation
 
-everything done on cmslpc el8
 
 ### Setup
+
+Log in to cmslpc el8
+
 ```bash
 git clone git@github.com:Christinaw97/HNL_generation.git
 cd HNL_generation
@@ -11,7 +13,9 @@ git clone https://gitlab.cern.ch/cms-gen/genproductions_scripts.git
 ```
 ### Gridpacks Generation
 Run `python3 wrapper_create_gridpack_parallel.py` to generate gridpacks for all flavor, mass, and ctau. Job logs saved in `logs`
+
 To check if the gridpacks were created successfully:
+
 ```bash
 cd scripts
 python3 check_logs.py ../logs
