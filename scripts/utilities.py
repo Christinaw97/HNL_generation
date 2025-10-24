@@ -89,7 +89,7 @@ def get_xsec(flavor, mass, coupling = None, ctau = None, csv_file="/data/decay_r
     target_name = f"HNL_{flavor}_mN_{m_str}_coupling_{default_coupling}_13p6TeV"
     xsec_default = None
     ctau_default = None
-    with open(csv_file, newline='', encoding='utf-8') as f:
+    with open(f"{get_git_root()}/{csv_file}", newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row["name"] == target_name: 
