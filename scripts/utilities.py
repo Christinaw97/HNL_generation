@@ -5,12 +5,12 @@ import subprocess
 def get_git_root():
     return subprocess.check_output(
         ["git", "rev-parse", "--show-toplevel"],
-        text=True
+        universal_newlines=True
     ).strip()
 
 
 
-def get_ctau(flavor, mass, coupling, csv_file="/uscms_data/d3/christiw/Run3_MDS/private_generation/gridpacks_generation/HNL_generation/data/decay_results.csv"):
+def get_ctau(flavor, mass, coupling, csv_file="/data/decay_results.csv"):
     """
     Read a CSV file and return ctau for a given HNL flavor, mass, and coupling.
 
@@ -23,19 +23,20 @@ def get_ctau(flavor, mass, coupling, csv_file="/uscms_data/d3/christiw/Run3_MDS/
     Returns:
         float or None: The ctau value in mm, or None if not found.
     """
+    print(csv_file)
     if type(mass) == int: m_str = str(mass)+'p0'
     else: m_str = str(mass).replace('.', 'p')
     coupling_str = str(coupling).replace('.', 'p')
     default_coupling = "0p01"
     target_name = f"HNL_{flavor}_mN_{m_str}_coupling_{default_coupling}_13p6TeV"
     ctau_default = None
-    with open(csv_file, newline='', encoding='utf-8') as f:
+    with open(f"{get_git_root()}/{csv_file}", newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row["name"] == target_name: ctau_default = float(row["ctau [mm]"])
     if ctau_default is None: print("mass and flavor combination not found in csv")
     return ctau_default * float(default_coupling.replace('p','.'))**2/coupling**2
-def get_coupling(flavor, mass, ctau,  csv_file="/uscms_data/d3/christiw/Run3_MDS/private_generation/gridpacks_generation/HNL_generation/data/decay_results.csv"):
+def get_coupling(flavor, mass, ctau,  csv_file=f"/data/decay_results.csv"):
     """
     Read a CSV file and return coupling for a given HNL flavor, mass, and ctau
 
@@ -53,7 +54,7 @@ def get_coupling(flavor, mass, ctau,  csv_file="/uscms_data/d3/christiw/Run3_MDS
     default_coupling = "0p01"
     target_name = f"HNL_{flavor}_mN_{m_str}_coupling_{default_coupling}_13p6TeV"
     ctau_default = None
-    with open(csv_file, newline='', encoding='utf-8') as f:
+    with open(f"{get_git_root()}/{csv_file}", newline='', encoding='utf-8') as f:
         reader = csv.DictReader(f)
         for row in reader:
             if row["name"] == target_name: ctau_default = float(row["ctau [mm]"])
@@ -63,7 +64,7 @@ def get_coupling(flavor, mass, ctau,  csv_file="/uscms_data/d3/christiw/Run3_MDS
 
 
 
-def get_xsec(flavor, mass, coupling = None, ctau = None, csv_file="/uscms_data/d3/christiw/Run3_MDS/private_generation/gridpacks_generation/HNL_generation/data/decay_results.csv"):
+def get_xsec(flavor, mass, coupling = None, ctau = None, csv_file="/data/decay_results.csv"):
     """
     Read a CSV file and return xsec for a given HNL flavor, mass, providing coupling or ctau.
 
@@ -101,4 +102,3 @@ def get_xsec(flavor, mass, coupling = None, ctau = None, csv_file="/uscms_data/d
     if coupling: return xsec_default / float(default_coupling.replace('p','.'))**2 * coupling**2
     if ctau: return xsec_default * ctau_default / ctau
     return None
-    
